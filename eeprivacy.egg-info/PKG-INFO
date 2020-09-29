@@ -1,0 +1,35 @@
+Metadata-Version: 1.0
+Name: eeprivacy
+Version: 0.0.1
+Summary: Energy Differential Privacy
+Home-page: http://github.com/openeemeter/eeprivacy
+Author: Marc Paré
+Author-email: marc@recurve.com
+License: UNKNOWN
+Description: 
+        eeprivacy
+        =========
+        
+        This repository contains the pilot implementation of the core privacy methods for the Energy Data Vault. The key components are:
+        
+        * Core Differential Privacy for energy efficiency analytics (`eeprivacy`)
+        * Python API documentation for `eeprivacy`
+        * Sample implementations of key use cases
+        
+        ---
+        
+        The Energy Data Vault (EDV) enables the use of the gold standard of privacy protection, differential privacy, for high value energy efficiency analytics. 
+        
+        ---
+        
+        Development
+        -----------
+        
+        Build docs:
+        
+        	./bin/build_docs
+        
+        Run tests:
+        	
+        	./bin/test
+Platform: UNKNOWN

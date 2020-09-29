@@ -13,6 +13,12 @@ The Energy Data Vault (EDV) enables the use of the gold standard of privacy prot
 
 ---
 
+Installation
+-----------
+
+	pip install eeprivacy
+
+
 Development
 -----------
 
