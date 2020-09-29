@@ -20,10 +20,6 @@ Installation
 
 	pip install eeprivacy
 
-
-Documentation
--------------
-
 Development
 -----------
 
