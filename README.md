@@ -20,6 +20,20 @@ Installation
 
 	pip install eeprivacy
 
+Local Usage
+-----------
+
+**Notebooks**
+
+With your preferred notebook environment (like [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/) or [nteract](https://nteract.io/)), install `eeprivacy` and try out any of the [example notebooks](https://openeemeter.github.io/eeprivacy/private-load-shape-algorithm-design.html). 
+
+**REPL**
+
+	>>> from eeprivacy.mechanisms import LaplaceMechanism
+	>>> LaplaceMechanism.execute(value=0, epsilon=0.1, sensitivity=1)
+	1.198515653814998
+
+
 Development
 -----------
 
