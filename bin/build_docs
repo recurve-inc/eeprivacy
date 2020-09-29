@@ -3,5 +3,6 @@ make clean && make html
 
 # Copy docs into directory for GitHub pages
 cp -R build/html/ ../docs
+touch ../docs/.nojekyll
 
 python -m http.server
