@@ -1,3 +1,7 @@
 cd docs
 make clean && make html
+
+# Copy docs into directory for GitHub pages
+cp -R build/html/ ../docs-live
+
 python -m http.server
