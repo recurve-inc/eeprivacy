@@ -1,0 +1,8 @@
+__pycache__/
+dist/
+*.DS_Store
+build/
+.eggs/
+.envrc
+.mypy_cache/
+.pytest_cache/
