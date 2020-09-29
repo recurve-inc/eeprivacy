@@ -7,6 +7,8 @@ This repository contains the pilot implementation of the core privacy methods fo
 * Python API documentation for `eeprivacy`
 * Sample implementations of key use cases
 
+[Examples and library documentation](https://openeemeter.github.io/eeprivacy/)
+
 ---
 
 The Energy Data Vault (EDV) enables the use of the gold standard of privacy protection, differential privacy, for high value energy efficiency analytics. 
