@@ -1,11 +1,7 @@
-EDV Pilot
+eeprivacy
 =========
 
-```
-[EDV Logo] [eeprivacy logo]
-```
-
-This repository contains the pilot implementation of the Energy Data Vault. The key components are:
+This repository contains the pilot implementation of the core privacy methods for the Energy Data Vault. The key components are:
 
 * Core Differential Privacy for energy efficiency analytics (`eeprivacy`)
 * Python API documentation for `eeprivacy`
@@ -17,11 +13,16 @@ The Energy Data Vault (EDV) enables the use of the gold standard of privacy prot
 
 ---
 
+Development
+-----------
+
 Build docs:
 
-	cd docs
-	make clean && make html
-	python -m http.server
+	./bin/build_docs
+
+Run tests:
+	
+	./bin/test
 
 Get nteract running:
 
@@ -30,8 +31,3 @@ Get nteract running:
 	source my_environment_name/bin/activate  # activate the virtual environment
 	python -m pip install ipykernel          # install the python kernel (ipykernel) into the virtual environment
 	python -m ipykernel install              # install python kernel into nteract's available kernel list
-
-Run tests:
-	
-	pip install -e .
-	pytest
