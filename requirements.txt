@@ -1,0 +1,15 @@
+numpy
+pandas
+matplotlib
+scipy
+
+pytest-mypy
+sphinx
+sphinx_rtd_theme
+recommonmark
+nbconvert
+pandoc
+latex
+nbsphinx
+jupyter_client
+ipython
