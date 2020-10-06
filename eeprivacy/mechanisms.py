@@ -13,29 +13,30 @@ class LaplaceMechanism(Mechanism):
     """
 
     @staticmethod
-    def execute(
-        value: float = None,
-        values: List[float] = None,
-        *,
-        epsilon: float,
-        sensitivity: float,
-    ) -> Union[float, List[float]]:
+    def scale(*, sensitivity: float, epsilon: float):
+        return sensitivity / epsilon
+
+    @staticmethod
+    def execute(*, value: float, epsilon: float, sensitivity: float,) -> float:
+        """
+        Run the Laplace Mechanism, adding noise to `value` to realize differential
+        private at `epsilon` for the provided `sensitivity`.
+        """
+        b = LaplaceMechanism.scale(sensitivity=sensitivity, epsilon=epsilon)
+        return value + np.random.laplace(0, b)
+
+    @staticmethod
+    def execute_batch(
+        *, values: List[float], epsilon: float, sensitivity: float,
+    ) -> List[float]:
         """
         Run the Laplace Mechanism, adding noise to `value` to realize differential
         private at `epsilon` for the provided `sensitivity`.
 
-        If a list of `values` is provided, run the Laplace Mechanism multiple times,
-        once for each item in the list.
+        Runs the Laplace Mechanism multiple times, once for each item in the list.
         """
-        if value is not None and values is not None:
-            raise ValueError("Both `value` and `values` cannot be provided")
-
-        b = sensitivity / epsilon
-
-        if values is None:
-            return value + np.random.laplace(0, b)
-        else:
-            return values + np.random.laplace(0, b, size=len(values))
+        b = LaplaceMechanism.scale(sensitivity=sensitivity, epsilon=epsilon)
+        return values + np.random.laplace(0, b, size=len(values))
 
     @staticmethod
     def confidence_interval(
@@ -78,6 +79,10 @@ class GaussianMechanism(object):
     """
 
     @staticmethod
+    def scale(*, sensitivity: float, epsilon: float, delta: float) -> float:
+        return sensitivity * np.sqrt(2 * np.log(1.25 / delta)) / epsilon
+
+    @staticmethod
     def confidence_interval(
         *, epsilon: float, delta: float, sensitivity: float, confidence: float = 0.95,
     ) -> float:
@@ -94,29 +99,31 @@ class GaussianMechanism(object):
 
     @staticmethod
     def execute(
-        value: float = None,
-        values: List[float] = None,
-        *,
-        epsilon: float,
-        delta: float,
-        sensitivity: float,
-    ) -> Union[float, List[float]]:
+        *, value: float, epsilon: float, delta: float, sensitivity: float,
+    ) -> float:
+        """
+        Run the Gaussian Mechanism, adding noise to `value` to realize differential
+        private at (`epsilon`, `delta`) for the provided `sensitivity`.
+        """
+        b = GaussianMechanism.scale(
+            sensitivity=sensitivity, epsilon=epsilon, delta=delta
+        )
+        return value + np.random.normal(0, b)
+
+    @staticmethod
+    def execute_batch(
+        *, values: List[float], epsilon: float, delta: float, sensitivity: float,
+    ) -> List[float]:
         """
         Run the Gaussian Mechanism, adding noise to `value` to realize differential
         private at (`epsilon`, `delta`) for the provided `sensitivity`.
 
-        If a list of `values` is provided, run the Gaussian Mechanism multiple times,
-        once for each item in the list.
+        Runs the Gaussian Mechanism multiple times, once for each item in the list.
         """
-        if value is not None and values is not None:
-            raise ValueError("Both `value` and `values` cannot be provided")
-
-        b = sensitivity * np.sqrt(2 * np.log(1.25 / delta)) / epsilon
-
-        if values is None:
-            return value + np.random.normal(0, b)
-        else:
-            return values + np.random.normal(0, b, size=len(values))
+        b = GaussianMechanism.scale(
+            sensitivity=sensitivity, epsilon=epsilon, delta=delta
+        )
+        return values + np.random.normal(0, b, size=len(values))
 
     @staticmethod
     def epsilon_for_confidence_interval(

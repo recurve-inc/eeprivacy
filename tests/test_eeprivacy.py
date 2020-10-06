@@ -6,8 +6,8 @@ from eeprivacy.mechanisms import LaplaceMechanism, GaussianMechanism
 def test_laplace_mechanism_invocation():
     """Test a few variations of arguments for the Laplace Mechanism"""
     LaplaceMechanism.execute(value=0, epsilon=0.1, sensitivity=1)
-    LaplaceMechanism.execute(values=[], epsilon=0.1, sensitivity=1)
-    LaplaceMechanism.execute(values=[0, 1], epsilon=0.1, sensitivity=1)
+    LaplaceMechanism.execute_batch(values=[], epsilon=0.1, sensitivity=1)
+    LaplaceMechanism.execute_batch(values=[0, 1], epsilon=0.1, sensitivity=1)
 
 
 def test_laplace_mechanism_confidence_interval():

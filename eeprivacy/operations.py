@@ -11,7 +11,7 @@ class PrivateCount(Operation):
     def __init__(self):
         pass
 
-    def execute(self, values=None, epsilon=None):
+    def execute(self, *, values, epsilon):
         pass
 
 
@@ -20,11 +20,11 @@ class PrivateClampedMean(Operation):
     Compute a mean, bounding sensitivity with clamping. Employs the Laplace Mechanism.
     """
 
-    def __init__(self, lower_bound: float = None, upper_bound: float = None):
+    def __init__(self, *, lower_bound: float, upper_bound: float):
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
 
-    def execute(self, values: List[float] = None, epsilon: float = None) -> float:
+    def execute(self, *, values: List[float], epsilon: float) -> float:
         """
         Computes the mean of `values` privately using a clamped mean.
 
@@ -64,7 +64,7 @@ class PrivateClampedMean(Operation):
 
         return private_mean
 
-    def confidence_interval(self, epsilon=None, N=None, confidence=0.95):
+    def confidence_interval(self, *, epsilon, N, confidence=0.95):
         """Compute the two-sided confidence interval for the mean."""
         return LaplaceMechanism.confidence_interval(
             epsilon=epsilon,
@@ -72,7 +72,7 @@ class PrivateClampedMean(Operation):
             confidence=confidence,
         )
 
-    def epsilon_for_confidence_interval(self, target_ci=None, N=None, confidence=0.95):
+    def epsilon_for_confidence_interval(self, *, target_ci, N, confidence=0.95):
         """Return epsilon for a desired confidence interval."""
         return LaplaceMechanism.epsilon_for_confidence_interval(
             target_ci=target_ci,
@@ -97,11 +97,7 @@ class PrivateVectorClampedMeanGaussian(Operation):
     """
 
     def __init__(
-        self,
-        lower_bound: float = None,
-        upper_bound: float = None,
-        k: float = None,
-        N: float = None,
+        self, *, lower_bound: float, upper_bound: float, k: float, N: float,
     ):
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
@@ -112,9 +108,7 @@ class PrivateVectorClampedMeanGaussian(Operation):
     def sensitivity(self):
         return (self.upper_bound - self.lower_bound) / self.N * np.sqrt(self.k)
 
-    def execute(
-        self, vectors: List[float] = None, epsilon: float = None, delta: float = None
-    ) -> float:
+    def execute(self, *, vectors: List[float], epsilon: float, delta: float) -> float:
         """
         Computes the mean of `vectors` privately using a clamped sum and
         exact count with the Gaussian Mechanism.
@@ -133,14 +127,13 @@ class PrivateVectorClampedMeanGaussian(Operation):
         sensitivity = (upper_bound - lower_bound) * np.sqrt(k)
 
         private_sum = GaussianMechanism.execute(
-            values=exact_sum, epsilon=epsilon, sensitivity=sensitivity, delta=delta
+            value=exact_sum, epsilon=epsilon, sensitivity=sensitivity, delta=delta
         )
 
-        return private_sum
         return private_sum / self.N
 
     def confidence_interval(
-        self, epsilon: float = None, delta: float = None, confidence: float = 0.95
+        self, *, epsilon: float, delta: float, confidence: float = 0.95
     ) -> float:
         return GaussianMechanism.confidence_interval(
             epsilon=epsilon,
@@ -150,7 +143,7 @@ class PrivateVectorClampedMeanGaussian(Operation):
         )
 
     def epsilon_for_confidence_interval(
-        self, target_ci: float = None, delta: float = None, confidence: float = 0.95
+        self, *, target_ci: float, delta: float, confidence: float = 0.95
     ) -> float:
         return GaussianMechanism.epsilon_for_confidence_interval(
             target_ci=target_ci,
@@ -176,11 +169,7 @@ class PrivateVectorClampedMeanLaplace(Operation):
     """
 
     def __init__(
-        self,
-        lower_bound: float = None,
-        upper_bound: float = None,
-        k: float = None,
-        N: float = None,
+        self, *, lower_bound: float, upper_bound: float, k: float, N: float,
     ):
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
@@ -191,9 +180,7 @@ class PrivateVectorClampedMeanLaplace(Operation):
     def sensitivity(self) -> float:
         return (self.upper_bound - self.lower_bound) / self.N * self.k
 
-    def execute(
-        self, vectors: List[float] = None, epsilon: float = None, delta: float = None
-    ) -> float:
+    def execute(self, *, vectors: List[float], epsilon: float, delta: float) -> float:
         """
         Computes the mean of `vectors` privately using a clamped sum and
         exact count with the Laplace Mechanism.
@@ -211,18 +198,18 @@ class PrivateVectorClampedMeanLaplace(Operation):
         sensitivity = (upper_bound - lower_bound) * self.k
 
         private_sum = LaplaceMechanism.execute(
-            values=exact_sum, epsilon=epsilon, sensitivity=sensitivity
+            value=exact_sum, epsilon=epsilon, sensitivity=sensitivity
         )
 
         return private_sum / self.N
 
-    def confidence_interval(self, epsilon=None, confidence=0.95) -> float:
+    def confidence_interval(self, *, epsilon, confidence=0.95) -> float:
         return LaplaceMechanism.confidence_interval(
             epsilon=epsilon, sensitivity=self.sensitivity, confidence=confidence,
         )
 
     def epsilon_for_confidence_interval(
-        self, target_ci=None, delta=None, confidence=0.95
+        self, *, target_ci, delta, confidence=0.95
     ) -> float:
         return LaplaceMechanism.epsilon_for_confidence_interval(
             target_ci=target_ci, confidence=confidence, sensitivity=self.sensitivity,
@@ -234,13 +221,11 @@ class PrivateHistogram(Operation):
     Compute a private histogram with the Laplace Mechanism.
     """
 
-    def __init__(
-        self, bins: List[float] = None, max_individual_contribution: float = 1
-    ):
+    def __init__(self, *, bins: List[float], max_individual_contribution: float = 1):
         self.bins = bins
         self.max_individual_contribution = max_individual_contribution
 
-    def execute(self, values: List[float] = None, epsilon: float = None) -> float:
+    def execute(self, *, values: List[float], epsilon: float) -> List[float]:
         """
         Computes the histogram of `values` privately.
 
@@ -265,14 +250,12 @@ class PrivateHistogram(Operation):
         bins = np.sort(self.bins)
         values = np.clip(values, bins[0], bins[-1])
         counts, _ = np.histogram(values, bins=bins)
-        noisy_counts = LaplaceMechanism.execute(
+        noisy_counts = LaplaceMechanism.execute_batch(
             values=counts, epsilon=epsilon, sensitivity=sensitivity
         )
         return noisy_counts
 
-    def confidence_interval(
-        self, epsilon: float = None, confidence: float = 0.95
-    ) -> float:
+    def confidence_interval(self, *, epsilon: float, confidence: float = 0.95) -> float:
         """Return the confidence interval for each bar of the histogram."""
         return LaplaceMechanism.confidence_interval(
             epsilon=epsilon,
@@ -284,16 +267,11 @@ class PrivateHistogram(Operation):
 class PrivateQuantile(Operation):
     """Find quantiles privately with the `Report Noisy Max` mechanism."""
 
-    def __init__(
-        self, options: List[float] = None, max_individual_contribution: int = 1
-    ):
+    def __init__(self, *, options: List[float], max_individual_contribution: int = 1):
         self.options = options
         self.max_individual_contribution = max_individual_contribution
 
-    def execute(
-        self, epsilon: float, quantile: float = None, values: List[float] = None
-    ):
-
+    def execute(self, *, epsilon: float, quantile: float, values: List[float]):
         """
         Computes the quantile of a list of values privately.
 
@@ -319,7 +297,7 @@ class PrivateQuantile(Operation):
             return -np.abs(count - N * quantile)
 
         scores = [score(values, option) for option in self.options]
-        noisy_scores = LaplaceMechanism.execute(
+        noisy_scores = LaplaceMechanism.execute_batch(
             values=scores, epsilon=epsilon, sensitivity=sensitivity
         )
         max_idx = np.argmax(noisy_scores)
