@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Union
 import numpy as np  # type: ignore
-from scipy.special import erfinv
+from scipy.special import erfinv  # type: ignore
 
 
 class Mechanism(object):
@@ -16,9 +16,10 @@ class LaplaceMechanism(Mechanism):
     def execute(
         value: float = None,
         values: List[float] = None,
-        epsilon: float = None,
-        sensitivity: float = None,
-    ) -> float:
+        *,
+        epsilon: float,
+        sensitivity: float,
+    ) -> Union[float, List[float]]:
         """
         Run the Laplace Mechanism, adding noise to `value` to realize differential
         private at `epsilon` for the provided `sensitivity`.
@@ -29,18 +30,16 @@ class LaplaceMechanism(Mechanism):
         if value is not None and values is not None:
             raise ValueError("Both `value` and `values` cannot be provided")
 
-        kwargs = {}
-        if values is None:
-            values = value
-        else:
-            kwargs["size"] = len(values)
-
         b = sensitivity / epsilon
-        return values + np.random.laplace(0, b, **kwargs)
+
+        if values is None:
+            return value + np.random.laplace(0, b)
+        else:
+            return values + np.random.laplace(0, b, size=len(values))
 
     @staticmethod
     def confidence_interval(
-        epsilon: float, sensitivity: float, confidence: float = 0.95
+        *, epsilon: float, sensitivity: float, confidence: float = 0.95
     ) -> float:
         """Determine the two-sided confidence interval for a given privacy parameter.
         """
@@ -60,7 +59,7 @@ class LaplaceMechanism(Mechanism):
 
     @staticmethod
     def epsilon_for_confidence_interval(
-        target_ci: float, sensitivity: float, confidence: float = 0.95
+        *, target_ci: float, sensitivity: float, confidence: float = 0.95
     ) -> float:
         """Determine the privacy parameter for a desired accuracy.
         """
@@ -80,7 +79,7 @@ class GaussianMechanism(object):
 
     @staticmethod
     def confidence_interval(
-        epsilon: float, delta: float, sensitivity: float, confidence: float = 0.95,
+        *, epsilon: float, delta: float, sensitivity: float, confidence: float = 0.95,
     ) -> float:
         """
         Return the confidence interval for the Gaussian Mechanism at a given
@@ -97,10 +96,11 @@ class GaussianMechanism(object):
     def execute(
         value: float = None,
         values: List[float] = None,
-        epsilon: float = None,
-        sensitivity: float = None,
-        delta: float = None,
-    ) -> float:
+        *,
+        epsilon: float,
+        delta: float,
+        sensitivity: float,
+    ) -> Union[float, List[float]]:
         """
         Run the Gaussian Mechanism, adding noise to `value` to realize differential
         private at (`epsilon`, `delta`) for the provided `sensitivity`.
@@ -111,15 +111,12 @@ class GaussianMechanism(object):
         if value is not None and values is not None:
             raise ValueError("Both `value` and `values` cannot be provided")
 
-        kwargs = {}
-        if values is None:
-            values = value
-        else:
-            kwargs["size"] = len(values)
-
         b = sensitivity * np.sqrt(2 * np.log(1.25 / delta)) / epsilon
 
-        return values + np.random.normal(0, b, **kwargs)
+        if values is None:
+            return value + np.random.normal(0, b)
+        else:
+            return values + np.random.normal(0, b, size=len(values))
 
     @staticmethod
     def epsilon_for_confidence_interval(
