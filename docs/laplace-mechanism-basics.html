@@ -429,14 +429,14 @@ div.rendered_html tbody tr:hover {
 <p>This mechanism works well for computing means and histograms, providing accurate results at minimal privacy budgets.</p>
 <p>This notebook walks through the basic <code class="docutils literal notranslate"><span class="pre">eeprivacy</span></code> functions for working with the Laplace Mechanism.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Preamble: imports and figure settings</span>
 
-<span class="kn">from</span> <span class="nn">eeprivacy</span> <span class="kn">import</span> <span class="p">(</span>
-  <span class="n">LaplaceMechanism</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">eeprivacy.mechanisms</span> <span class="kn">import</span> <span class="n">LaplaceMechanism</span>
+<span class="kn">from</span> <span class="nn">eeprivacy.operations</span> <span class="kn">import</span> <span class="p">(</span>
   <span class="n">PrivateClampedMean</span><span class="p">,</span>
   <span class="n">PrivateHistogram</span><span class="p">,</span>
 <span class="p">)</span>
@@ -468,7 +468,7 @@ div.rendered_html tbody tr:hover {
 <h2>Distribution of Laplace Mechanism Outputs<a class="headerlink" href="#Distribution-of-Laplace-Mechanism-Outputs" title="Permalink to this headline">¶</a></h2>
 <p>For a given ε, noise is drawn from the Laplace distribution at <code class="docutils literal notranslate"><span class="pre">b</span></code>=<code class="docutils literal notranslate"><span class="pre">sensitivity</span></code>/ε. The <code class="docutils literal notranslate"><span class="pre">eeprivacy</span></code> class <code class="docutils literal notranslate"><span class="pre">LaplaceMechanism</span></code> draws this noise and adds it to a private value:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -501,7 +501,7 @@ div.rendered_html tbody tr:hover {
 <p>To determine the privacy parameters for a desired confidence interval, employ <code class="docutils literal notranslate"><span class="pre">eeprivacy.laplace_mechanism_epsilon_for_confidence_interval</span></code>.</p>
 <p>The confidence intervals reported below are two-sided. For example, for a 95% confidence interval of +/-10, 2.5% of results will be smaller than -10 and 2.5% of results will be larger than +10.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
