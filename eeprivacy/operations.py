@@ -135,6 +135,7 @@ class PrivateVectorClampedMeanGaussian(Operation):
     def confidence_interval(
         self, *, epsilon: float, delta: float, confidence: float = 0.95
     ) -> float:
+        """Compute the two-sided confidence interval for the mean."""
         return GaussianMechanism.confidence_interval(
             epsilon=epsilon,
             delta=delta,
@@ -145,6 +146,7 @@ class PrivateVectorClampedMeanGaussian(Operation):
     def epsilon_for_confidence_interval(
         self, *, target_ci: float, delta: float, confidence: float = 0.95
     ) -> float:
+        """Return epsilon for a desired confidence interval."""
         return GaussianMechanism.epsilon_for_confidence_interval(
             target_ci=target_ci,
             delta=delta,
