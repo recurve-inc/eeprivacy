@@ -13,19 +13,19 @@ TEST_DATA_COLUMNS = ["age", "sex", "educ", "race", "income", "married", "pid"]
 
 
 def test_private_clamped_mean():
+    # TODO: flesh out this test further. Or maybe it's tested in a stochastic
+    #       testing harness?
     op = PrivateClampedMean(lower_bound=0, upper_bound=100)
     op.execute(values=[1, 2, 3], epsilon=0.1)
 
 
 def test_private_clamped_mean_helpers():
     # Compute the CI with whitenoise
-    release = None
     with wn.Analysis() as analysis:
         data = wn.Dataset(path=TEST_DATA_PATH, column_names=TEST_DATA_COLUMNS)
         D = wn.to_float(data["age"])
         D_tilde = wn.resize(wn.clamp(data=D, lower=0.0, upper=100.0), number_rows=1000,)
         release = wn.dp_mean(data=wn.impute(D_tilde), privacy_usage={"epsilon": 1.0})
-
     whitenoise_ci = release.get_accuracy(0.05)
 
     # Compute the CI with eeprivacy
@@ -42,3 +42,11 @@ def test_private_clamped_mean_helpers():
 
     # Compare computed epsilons for confidence interval
     assert pytest.approx(whitenoise_epsilon, abs=0.001) == eeprivacy_epsilon
+
+
+def test_private_histogram_helpers():
+    pass
+
+
+def test_private_vector_clamped_mean_gaussian_helpers():
+    pass

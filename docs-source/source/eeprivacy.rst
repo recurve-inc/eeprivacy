@@ -21,7 +21,7 @@ The confidence intervals returned by `Mechanism` classes are two-sided.
 
 For example, in the algorithm design helper function `epsilon_for_confidence_interval` the ε value returned for the Laplace Mechanism at the default `confidence` = 0.95 and `target_ci` = 5, the distribution of outputs for the returned ε would be the following::
 
-      .25% │      █      │ .25%
+      2.5% │      █      │ 2.5%
     ◀──────│      █      │──────▶
            │      █      │
            │     ███     │
