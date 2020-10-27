@@ -3,7 +3,7 @@ import numpy as np  # type: ignore
 from eeprivacy.mechanisms import LaplaceMechanism, GaussianMechanism
 
 
-class Operation(object):
+class Operation:
     pass
 
 
@@ -83,9 +83,18 @@ class PrivateClampedMean(Operation):
 
 class PrivateVectorClampedMeanGaussian(Operation):
     """
-    A simple implementation of the mean operation that requires the size of the
-    dataset up front (either pass it exactly if it is not private or compute with
-    a private count).
+    A vector mean computes the elementwise mean of a vector-valued dataset. That is,
+    a dataset in which each row is a vector of values corresponding to each
+    individual. For example::
+
+        six_hourly_energy_consumptions = [
+            [4.2, 11.1, 14.1, 3.2],
+            [1.4, 4.5.1, 4.8, 1.6],
+            ...
+        ]
+
+    This implementation requires the size of the dataset upfront (either pass it 
+    exactly if it is not private or compute with a private count).
 
     With the Gaussian Mechanism, noise is scaled to the L2 norm of the dataset.
 
@@ -110,7 +119,7 @@ class PrivateVectorClampedMeanGaussian(Operation):
 
     def execute(self, *, vectors: List[float], epsilon: float, delta: float) -> float:
         """
-        Computes the mean of `vectors` privately using a clamped sum and
+        Computes the elementwise mean of `vectors` privately using a clamped sum and
         exact count with the Gaussian Mechanism.
         """
 
@@ -221,9 +230,18 @@ class PrivateVectorClampedMeanLaplace(Operation):
 class PrivateHistogram(Operation):
     """
     Compute a private histogram with the Laplace Mechanism.
+
+    Args:
+        bins: Edges of bins for results. These must be specified up-front
+            otherwise information will be leaked by the choice of bins. `Read more`_
+        max_individual_contribution: Maximum count any individual in the dataset
+            could contribute to the histogram. Normally `1`.
+
+    .. _Read more:
+        https://desfontain.es/privacy/almost-differential-privacy.html
     """
 
-    def __init__(self, *, bins: List[float], max_individual_contribution: float = 1):
+    def __init__(self, *, bins: List[float], max_individual_contribution: int = 1):
         self.bins = bins
         self.max_individual_contribution = max_individual_contribution
 
@@ -233,20 +251,8 @@ class PrivateHistogram(Operation):
 
         Values are clamped to the bound specified by ``bins``.
 
-        Args:
-            values (List[float]): Values to bin into histogram
-            bins (List[float]): Edges of bins for results. These must be specified up-front
-                otherwise information will be leaked by the choice of bins. `Read more`_
-            epsilon (float): privacy parameter
-            sensitivity (float): Defaults to one (assumes a counting query)
-
-        Returns:
-            List[float]: Private count for each bin.
-            float: Confidence interval for each bin of the histogram
-
-        .. _Read more:
-            https://desfontain.es/privacy/almost-differential-privacy.html
-
+        Return: 
+            A list of private counts, one for each bin.
         """
         sensitivity = self.max_individual_contribution
         bins = np.sort(self.bins)
@@ -267,13 +273,19 @@ class PrivateHistogram(Operation):
 
 
 class PrivateQuantile(Operation):
-    """Find quantiles privately with the `Report Noisy Max` mechanism."""
+    """Find quantiles privately with the `Report Noisy Max` mechanism.
+
+    Args:
+        options: List of possible outputs
+        max_individual_contribution: Normally 1, unless an individual can contribute
+            multiple points to the dataset.
+    """
 
     def __init__(self, *, options: List[float], max_individual_contribution: int = 1):
         self.options = options
         self.max_individual_contribution = max_individual_contribution
 
-    def execute(self, *, epsilon: float, quantile: float, values: List[float]):
+    def execute(self, *, values: List[float], epsilon: float, quantile: float):
         """
         Computes the quantile of a list of values privately.
 
@@ -281,11 +293,8 @@ class PrivateQuantile(Operation):
 
         Args:
             values: Dataset
-            options: List of possible outputs
-            quantile: Quantile to return (between 0 and 1)
             epsilon: Privacy parameter
-            sensitivity: Normally 1, unless an individual can contribute
-                multiple points to the dataset.
+            quantile: Quantile to return (between 0 and 1)
 
         References:
         - Dwork, C., Roth, A., 2013. The Algorithmic Foundations of Differential Privacy. FNT in Theoretical Computer Science 9, 211–407. https://doi.org/10.1561/0400000042

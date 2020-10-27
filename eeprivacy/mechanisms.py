@@ -3,7 +3,7 @@ import numpy as np  # type: ignore
 from scipy.special import erfinv  # type: ignore
 
 
-class Mechanism(object):
+class Mechanism:
     pass
 
 
@@ -92,9 +92,7 @@ class GaussianMechanism(object):
         """
 
         sigma = sensitivity * np.sqrt(2 * np.log(1.25 / delta)) / epsilon
-        quantile = 1.0 - (1.0 - confidence) / 2.0
-
-        Q = sigma * np.sqrt(2) * erfinv(2 * quantile - 1)
+        Q = sigma * np.sqrt(2) * erfinv(confidence)
         return Q
 
     @staticmethod

@@ -5,7 +5,12 @@ import pytest
 import numpy as np  # type: ignore
 import opendp.whitenoise.core as wn  # type: ignore
 import pandas as pd  # type: ignore
-from eeprivacy.operations import PrivateClampedMean
+from eeprivacy.mechanisms import LaplaceMechanism
+from eeprivacy.operations import (
+    PrivateClampedMean,
+    PrivateHistogram,
+    PrivateVectorClampedMeanGaussian,
+)
 
 HERE = pathlib.Path(__file__).parent.absolute()
 TEST_DATA_PATH = os.path.join(HERE, "data", "PUMS_california_demographics_1000.csv")
@@ -45,7 +50,12 @@ def test_private_clamped_mean_helpers():
 
 
 def test_private_histogram_helpers():
-    pass
+    op = PrivateHistogram(bins=[], max_individual_contribution=1)
+    histogram_ci = op.confidence_interval(epsilon=1, confidence=0.95)
+    laplace_ci = LaplaceMechanism.confidence_interval(
+        epsilon=1, sensitivity=1, confidence=0.95
+    )
+    assert histogram_ci == laplace_ci
 
 
 def test_private_vector_clamped_mean_gaussian_helpers():

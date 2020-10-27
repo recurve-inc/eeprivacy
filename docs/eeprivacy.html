@@ -234,8 +234,18 @@
 
 <dl class="py class">
 <dt id="eeprivacy.operations.PrivateHistogram">
-<em class="property">class </em><code class="sig-prename descclassname">eeprivacy.operations.</code><code class="sig-name descname">PrivateHistogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">max_individual_contribution</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateHistogram" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">eeprivacy.operations.</code><code class="sig-name descname">PrivateHistogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">max_individual_contribution</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateHistogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute a private histogram with the Laplace Mechanism.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bins</strong> – Edges of bins for results. These must be specified up-front
+otherwise information will be leaked by the choice of bins. <a class="reference external" href="https://desfontain.es/privacy/almost-differential-privacy.html">Read more</a></p></li>
+<li><p><strong>max_individual_contribution</strong> – Maximum count any individual in the dataset
+could contribute to the histogram. Normally <cite>1</cite>.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="eeprivacy.operations.PrivateHistogram.confidence_interval">
 <code class="sig-name descname">confidence_interval</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">epsilon</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">confidence</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.95</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#eeprivacy.operations.PrivateHistogram.confidence_interval" title="Permalink to this definition">¶</a></dt>
@@ -248,21 +258,8 @@
 <dd><p>Computes the histogram of <cite>values</cite> privately.</p>
 <p>Values are clamped to the bound specified by <code class="docutils literal notranslate"><span class="pre">bins</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – Values to bin into histogram</p></li>
-<li><p><strong>bins</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – Edges of bins for results. These must be specified up-front
-otherwise information will be leaked by the choice of bins. <a class="reference external" href="https://desfontain.es/privacy/almost-differential-privacy.html">Read more</a></p></li>
-<li><p><strong>epsilon</strong> (<em>float</em>) – privacy parameter</p></li>
-<li><p><strong>sensitivity</strong> (<em>float</em>) – Defaults to one (assumes a counting query)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Private count for each bin.
-float: Confidence interval for each bin of the histogram</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[float]</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of private counts, one for each bin.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -273,20 +270,26 @@ float: Confidence interval for each bin of the histogram</p>
 <dt id="eeprivacy.operations.PrivateQuantile">
 <em class="property">class </em><code class="sig-prename descclassname">eeprivacy.operations.</code><code class="sig-name descname">PrivateQuantile</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">options</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">max_individual_contribution</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateQuantile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find quantiles privately with the <cite>Report Noisy Max</cite> mechanism.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>options</strong> – List of possible outputs</p></li>
+<li><p><strong>max_individual_contribution</strong> – Normally 1, unless an individual can contribute
+multiple points to the dataset.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="eeprivacy.operations.PrivateQuantile.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">epsilon</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">quantile</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">values</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateQuantile.execute" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">values</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">epsilon</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">quantile</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateQuantile.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the quantile of a list of values privately.</p>
 <p>Implemented using Report Noisy Max (Claim 3.9) of [Dwork and Roth].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> – Dataset</p></li>
-<li><p><strong>options</strong> – List of possible outputs</p></li>
-<li><p><strong>quantile</strong> – Quantile to return (between 0 and 1)</p></li>
 <li><p><strong>epsilon</strong> – Privacy parameter</p></li>
-<li><p><strong>sensitivity</strong> – Normally 1, unless an individual can contribute
-multiple points to the dataset.</p></li>
+<li><p><strong>quantile</strong> – Quantile to return (between 0 and 1)</p></li>
 </ul>
 </dd>
 </dl>
@@ -299,9 +302,18 @@ multiple points to the dataset.</p></li>
 <dl class="py class">
 <dt id="eeprivacy.operations.PrivateVectorClampedMeanGaussian">
 <em class="property">class </em><code class="sig-prename descclassname">eeprivacy.operations.</code><code class="sig-name descname">PrivateVectorClampedMeanGaussian</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">lower_bound</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">upper_bound</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">k</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">N</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateVectorClampedMeanGaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p>A simple implementation of the mean operation that requires the size of the
-dataset up front (either pass it exactly if it is not private or compute with
-a private count).</p>
+<dd><p>A vector mean computes the elementwise mean of a vector-valued dataset. That is,
+a dataset in which each row is a vector of values corresponding to each
+individual. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">six_hourly_energy_consumptions</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mf">4.2</span><span class="p">,</span> <span class="mf">11.1</span><span class="p">,</span> <span class="mf">14.1</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">4.5</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>This implementation requires the size of the dataset upfront (either pass it
+exactly if it is not private or compute with a private count).</p>
 <p>With the Gaussian Mechanism, noise is scaled to the L2 norm of the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -328,7 +340,7 @@ a private count).</p>
 <dl class="py method">
 <dt id="eeprivacy.operations.PrivateVectorClampedMeanGaussian.execute">
 <code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">vectors</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">epsilon</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">delta</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#eeprivacy.operations.PrivateVectorClampedMeanGaussian.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the mean of <cite>vectors</cite> privately using a clamped sum and
+<dd><p>Computes the elementwise mean of <cite>vectors</cite> privately using a clamped sum and
 exact count with the Gaussian Mechanism.</p>
 </dd></dl>
 
