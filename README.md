@@ -1,7 +1,7 @@
 eeprivacy
 =========
 
-This repository contains the pilot implementation of the core privacy methods for the Energy Data Vault. The key components are:
+This repository contains the pilot implementation of the core privacy methods for Energy Differential Privacy (EDP). The key components are:
 
 * Core Differential Privacy for energy efficiency analytics (`eeprivacy`)
 * Python API documentation for `eeprivacy`
@@ -11,7 +11,7 @@ This repository contains the pilot implementation of the core privacy methods fo
 
 ---
 
-The Energy Data Vault (EDV) enables the use of the gold standard of privacy protection, differential privacy, for high value energy efficiency analytics. 
+Energy Differential Privacy (EDP) enables the use of the gold standard of privacy protection, differential privacy, for high value energy efficiency analytics. 
 
 ---
 
