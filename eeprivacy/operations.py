@@ -40,7 +40,7 @@ class PrivateClampedSum(Operation):
 
         return private_sum
 
-    def confidence_interval(self, *, epsilon, N, confidence=0.95):
+    def confidence_interval(self, *, epsilon, confidence=0.95):
         """Compute the two-sided confidence interval for the mean."""
         return LaplaceMechanism.confidence_interval(
             epsilon=epsilon,
@@ -48,7 +48,7 @@ class PrivateClampedSum(Operation):
             confidence=confidence,
         )
 
-    def epsilon_for_confidence_interval(self, *, target_ci, N, confidence=0.95):
+    def epsilon_for_confidence_interval(self, *, target_ci, confidence=0.95):
         """Return epsilon for a desired confidence interval."""
         return LaplaceMechanism.epsilon_for_confidence_interval(
             target_ci=target_ci,
