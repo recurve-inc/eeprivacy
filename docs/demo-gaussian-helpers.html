@@ -418,14 +418,12 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="Demo-Gaussian-Mechanism-Confidence-Interval">
 <h1>Demo Gaussian Mechanism Confidence Interval<a class="headerlink" href="#Demo-Gaussian-Mechanism-Confidence-Interval" title="Permalink to this headline">¶</a></h1>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">eeprivacy</span> <span class="kn">import</span> <span class="p">(</span>
-  <span class="n">gaussian_mechanism</span><span class="p">,</span>
-  <span class="n">gaussian_mechanism_confidence_interval</span><span class="p">,</span>
-  <span class="n">gaussian_mechanism_epsilon_for_confidence_interval</span><span class="p">,</span>
+<span></span><span class="kn">from</span> <span class="nn">eeprivacy.mechanisms</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GaussianMechanism</span>
 <span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -450,7 +448,7 @@ div.rendered_html tbody tr:hover {
 <span class="p">})</span>
 
 <span class="c1"># Exact</span>
-<span class="n">ci</span> <span class="o">=</span> <span class="n">gaussian_mechanism_confidence_interval</span><span class="p">(</span>
+<span class="n">ci</span> <span class="o">=</span> <span class="n">GaussianMechanism</span><span class="o">.</span><span class="n">confidence_interval</span><span class="p">(</span>
   <span class="n">epsilon</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sensitivity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">1e-12</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exact CI: </span><span class="si">{</span><span class="n">ci</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -458,15 +456,17 @@ div.rendered_html tbody tr:hover {
 <span class="c1"># Stochastic</span>
 <span class="n">trials</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
 
-  <span class="n">res</span> <span class="o">=</span> <span class="n">gaussian_mechanism</span><span class="p">(</span>
-    <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span>
-    <span class="n">epsilon</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">sensitivity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+  <span class="n">res</span> <span class="o">=</span> <span class="n">GaussianMechanism</span><span class="o">.</span><span class="n">execute_batch</span><span class="p">(</span>
+    <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10000</span><span class="p">),</span>
+    <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">100</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span>
     <span class="n">delta</span><span class="o">=</span><span class="mf">1e-12</span>
   <span class="p">)</span>
   <span class="n">trials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">trials</span><span class="p">))</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;CI from stochastic trial&quot;</span><span class="p">)</span>
@@ -483,6 +483,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Exact CI: 14.628781668617956
+14.620938800541428
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">

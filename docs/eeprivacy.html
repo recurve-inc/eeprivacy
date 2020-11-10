@@ -233,6 +233,35 @@
 </dd></dl>
 
 <dl class="py class">
+<dt id="eeprivacy.operations.PrivateClampedSum">
+<em class="property">class </em><code class="sig-prename descclassname">eeprivacy.operations.</code><code class="sig-name descname">PrivateClampedSum</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">lower_bound</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">upper_bound</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateClampedSum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a sum, bounding sensitivity with clamping. Employs the Laplace Mechanism.</p>
+<dl class="py method">
+<dt id="eeprivacy.operations.PrivateClampedSum.confidence_interval">
+<code class="sig-name descname">confidence_interval</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">epsilon</span></em>, <em class="sig-param"><span class="n">N</span></em>, <em class="sig-param"><span class="n">confidence</span><span class="o">=</span><span class="default_value">0.95</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateClampedSum.confidence_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the two-sided confidence interval for the mean.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="eeprivacy.operations.PrivateClampedSum.epsilon_for_confidence_interval">
+<code class="sig-name descname">epsilon_for_confidence_interval</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">target_ci</span></em>, <em class="sig-param"><span class="n">N</span></em>, <em class="sig-param"><span class="n">confidence</span><span class="o">=</span><span class="default_value">0.95</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateClampedSum.epsilon_for_confidence_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return epsilon for a desired confidence interval.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="eeprivacy.operations.PrivateClampedSum.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">values</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">epsilon</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#eeprivacy.operations.PrivateClampedSum.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the mean of <cite>values</cite> privately using a clamped sum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The private sum.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="eeprivacy.operations.PrivateHistogram">
 <em class="property">class </em><code class="sig-prename descclassname">eeprivacy.operations.</code><code class="sig-name descname">PrivateHistogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bins</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">max_individual_contribution</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateHistogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute a private histogram with the Laplace Mechanism.</p>

@@ -15,6 +15,48 @@ class PrivateCount(Operation):
         pass
 
 
+class PrivateClampedSum(Operation):
+    """
+    Compute a sum, bounding sensitivity with clamping. Employs the Laplace Mechanism.
+    """
+
+    def __init__(self, *, lower_bound: float, upper_bound: float):
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
+
+    def execute(self, *, values: List[float], epsilon: float) -> float:
+        """
+        Computes the mean of `values` privately using a clamped sum.
+
+        Return:
+            The private sum.
+        """
+        a = self.lower_bound
+        b = self.upper_bound
+
+        S = np.sum(np.clip(values, a, b))
+
+        private_sum = S + np.random.laplace(0, (b - a) / epsilon)
+
+        return private_sum
+
+    def confidence_interval(self, *, epsilon, N, confidence=0.95):
+        """Compute the two-sided confidence interval for the mean."""
+        return LaplaceMechanism.confidence_interval(
+            epsilon=epsilon,
+            sensitivity=(self.upper_bound - self.lower_bound),
+            confidence=confidence,
+        )
+
+    def epsilon_for_confidence_interval(self, *, target_ci, N, confidence=0.95):
+        """Return epsilon for a desired confidence interval."""
+        return LaplaceMechanism.epsilon_for_confidence_interval(
+            target_ci=target_ci,
+            sensitivity=(self.upper_bound - self.lower_bound),
+            confidence=confidence,
+        )
+
+
 class PrivateClampedMean(Operation):
     """
     Compute a mean, bounding sensitivity with clamping. Employs the Laplace Mechanism.

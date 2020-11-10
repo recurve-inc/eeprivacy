@@ -429,7 +429,7 @@ div.rendered_html tbody tr:hover {
 <p>This mechanism works well for computing means and histograms, providing accurate results at minimal privacy budgets.</p>
 <p>This notebook walks through the basic <code class="docutils literal notranslate"><span class="pre">eeprivacy</span></code> functions for working with the Laplace Mechanism.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -468,7 +468,7 @@ div.rendered_html tbody tr:hover {
 <h2>Distribution of Laplace Mechanism Outputs<a class="headerlink" href="#Distribution-of-Laplace-Mechanism-Outputs" title="Permalink to this headline">¶</a></h2>
 <p>For a given ε, noise is drawn from the Laplace distribution at <code class="docutils literal notranslate"><span class="pre">b</span></code>=<code class="docutils literal notranslate"><span class="pre">sensitivity</span></code>/ε. The <code class="docutils literal notranslate"><span class="pre">eeprivacy</span></code> class <code class="docutils literal notranslate"><span class="pre">LaplaceMechanism</span></code> draws this noise and adds it to a private value:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -477,7 +477,7 @@ div.rendered_html tbody tr:hover {
   <span class="n">trials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LaplaceMechanism</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">199</span><span class="o">/</span><span class="mi">3000</span>
   <span class="p">))</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
