@@ -173,15 +173,17 @@ class PrivateVectorClampedMeanGaussian(Operation):
             [np.clip(v, lower_bound, upper_bound) for v in vectors]
         )
 
-        exact_sum = np.sum(clamped_vectors, axis=0)
+        exact_sums = np.sum(clamped_vectors, axis=0)
+
+        exact_means = exact_sums / self.N
 
         sensitivity = (upper_bound - lower_bound) * np.sqrt(k)
 
-        private_sum = GaussianMechanism.execute_batch(
-            values=exact_sum, epsilon=epsilon, sensitivity=sensitivity, delta=delta
+        private_means = GaussianMechanism.execute_batch(
+            values=exact_means, epsilon=epsilon, sensitivity=sensitivity, delta=delta
         )
 
-        return private_sum / self.N
+        return private_means
 
     def confidence_interval(
         self, *, epsilon: float, delta: float, confidence: float = 0.95
