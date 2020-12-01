@@ -135,7 +135,7 @@ class PrivateVectorClampedMeanGaussian(Operation):
             ...
         ]
 
-    This implementation requires the size of the dataset upfront (either pass it 
+    This implementation requires the size of the dataset upfront (either pass it
     exactly if it is not private or compute with a private count).
 
     With the Gaussian Mechanism, noise is scaled to the L2 norm of the dataset.
@@ -177,8 +177,8 @@ class PrivateVectorClampedMeanGaussian(Operation):
 
         sensitivity = (upper_bound - lower_bound) * np.sqrt(k)
 
-        private_sum = GaussianMechanism.execute(
-            value=exact_sum, epsilon=epsilon, sensitivity=sensitivity, delta=delta
+        private_sum = GaussianMechanism.execute_batch(
+            values=exact_sum, epsilon=epsilon, sensitivity=sensitivity, delta=delta
         )
 
         return private_sum / self.N
