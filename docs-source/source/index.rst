@@ -12,13 +12,13 @@ In the ecosystem of open source differential privacy projects, EDP targets a sec
 
 .. toctree::
    :maxdepth: 4
-   :caption: Core Library:
+   :caption: Core Library
 
    eeprivacy
 
 .. toctree::
    :maxdepth: 4
-   :caption: Examples:
+   :caption: Examples
 
    laplace-mechanism-basics
    gaussian-mechanism-basics
@@ -27,6 +27,11 @@ In the ecosystem of open source differential privacy projects, EDP targets a sec
    private-load-shape-algorithm-design
    private-load-shapes
 
+.. toctree::
+   :maxdepth: 4
+   :caption: Applications
+
+   comparison-groups
 
 Indices and tables
 ==================

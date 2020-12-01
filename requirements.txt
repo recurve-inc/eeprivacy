@@ -1,15 +1,4 @@
-numpy
-pandas
-matplotlib
-scipy
 
-pytest-mypy
-sphinx
-sphinx_rtd_theme
-recommonmark
-nbconvert
-pandoc
-latex
-nbsphinx
-jupyter_client
-ipython
+setuptools~=50.3.2
+numpy~=1.19.4
+pandas~=1.1.4

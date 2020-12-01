@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; Energy Differential Privacy  documentation</title>
+  <title>Private Comparison Groups &mdash; Energy Differential Privacy  documentation</title>
   
 
   
@@ -38,7 +38,8 @@
 
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Computing Private Load Shapes" href="private-load-shapes.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -97,8 +98,15 @@
 <li class="toctree-l1"><a class="reference internal" href="private-load-shapes.html">Computing Private Load Shapes</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Applications</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="comparison-groups.html">Private Comparison Groups</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Private Comparison Groups</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Population-Mean-with-Laplace-Mechanism">Population Mean with Laplace Mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Population-P99-with-Laplace-Mechanism">Population P99 with Laplace Mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Comparison-Group-Percent-Change-in-Consumption-with-Laplace-Mechanism">Comparison Group Percent Change in Consumption with Laplace Mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Comparison-Group-Average-Load-Shape-with-Gaussian-Mechanism">Comparison Group Average Load Shape with Gaussian Mechanism</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -145,13 +153,13 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>&lt;no title&gt;</li>
+      <li>Private Comparison Groups</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/demo-private-histogram.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/comparison-groups.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -419,12 +427,20 @@ div.rendered_html tbody tr:hover {
     text-align: unset;
 }
 </style>
+<div class="section" id="Private-Comparison-Groups">
+<h1>Private Comparison Groups<a class="headerlink" href="#Private-Comparison-Groups" title="Permalink to this headline">¶</a></h1>
+<p>“Comparison Groups” is a powerful technique for isolating the effect of external influence on energy consumption. This technique has received growing attention because of the massive effect of COVID-19 quarantine measures on energy usage.</p>
+<p>This notebook applies the methods described in <a class="reference external" href="recurve.com">Differentially Private Comparison Groups: Motivation and Methods</a>, computing a number of useful Comparison Group statistics while preserving the privacy of individuals chosen for analysis.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">eeprivacy</span> <span class="kn">import</span> <span class="n">private_histogram_with_laplace</span><span class="p">,</span> <span class="n">laplace_mechanism_confidence_interval</span>
+<span></span><span class="c1"># Preamble: imports and figure settings</span>
+
+<span class="kn">from</span> <span class="nn">eeprivacy</span> <span class="kn">import</span> <span class="p">(</span>
+  <span class="n">PrivateVectorClampedMean</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -436,10 +452,10 @@ div.rendered_html tbody tr:hover {
 
 <span class="n">mpl</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;seaborn-white&quot;</span><span class="p">)</span>
 
-<span class="n">MD</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="n">LG</span> <span class="o">=</span> <span class="mi">24</span>
+<span class="n">MD</span> <span class="o">=</span> <span class="mi">28</span>
+<span class="n">LG</span> <span class="o">=</span> <span class="mi">36</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-    <span class="s2">&quot;figure.figsize&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+    <span class="s2">&quot;figure.figsize&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span>
     <span class="s2">&quot;legend.fontsize&quot;</span><span class="p">:</span> <span class="n">MD</span><span class="p">,</span>
     <span class="s2">&quot;axes.labelsize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
     <span class="s2">&quot;axes.titlesize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
@@ -449,57 +465,78 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="section" id="Dataset">
+<h2>Dataset<a class="headerlink" href="#Dataset" title="Permalink to this headline">¶</a></h2>
+<p>For this example, we generate a population of synthetic daily load shapes:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">private_histogram_with_laplace</span><span class="p">(</span>
-  <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
-  <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
-  <span class="n">epsilon</span><span class="o">=</span><span class="mf">1.0</span>
-<span class="p">)</span>
+<span></span><span class="k">def</span> <span class="nf">synthetic_load_shape</span><span class="p">():</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span>
+      <span class="mi">24</span>
+    <span class="p">])</span>
+    <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+      <span class="n">y0</span><span class="p">,</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">14</span><span class="p">),</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">9</span><span class="p">),</span>
+      <span class="n">y0</span>
+    <span class="p">])</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">p</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+    <span class="n">ys</span><span class="p">[</span><span class="n">ys</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">ys</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
 
-<span class="n">bin_centers</span> <span class="o">=</span> <span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">/</span> <span class="mi">2</span>
-<span class="n">bin_width</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">R</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">C</span> <span class="o">=</span> <span class="mi">5</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">bin_centers</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">bin_width</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Determining cutoff with private histogram query&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Hourly Energy Consumption (kWh)&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Private Count (log scale)&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">C</span><span class="p">):</span>
+        <span class="n">axx</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">i</span><span class="o">*</span><span class="n">C</span><span class="o">+</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">axx</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">])</span>
+        <span class="n">axx</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="n">axx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">synthetic_load_shape</span><span class="p">(),</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Sample of Synthetic Load Shapes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Hour of Day&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Energy Consumption (kWh)&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-[100.36062027  -0.23016168]
-[100.36062027  -0.23016168]
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/demo-private-histogram_1_1.png" src="_images/demo-private-histogram_1_1.png" />
+<img alt="_images/comparison-groups_3_0.png" src="_images/comparison-groups_3_0.png" />
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>
-</pre></div>
+<div class="section" id="Population-Mean-with-Laplace-Mechanism">
+<h2>Population Mean with Laplace Mechanism<a class="headerlink" href="#Population-Mean-with-Laplace-Mechanism" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="Population-P99-with-Laplace-Mechanism">
+<h2>Population P99 with Laplace Mechanism<a class="headerlink" href="#Population-P99-with-Laplace-Mechanism" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="Comparison-Group-Percent-Change-in-Consumption-with-Laplace-Mechanism">
+<h2>Comparison Group Percent Change in Consumption with Laplace Mechanism<a class="headerlink" href="#Comparison-Group-Percent-Change-in-Consumption-with-Laplace-Mechanism" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="Comparison-Group-Average-Load-Shape-with-Gaussian-Mechanism">
+<h2>Comparison Group Average Load Shape with Gaussian Mechanism<a class="headerlink" href="#Comparison-Group-Average-Load-Shape-with-Gaussian-Mechanism" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -508,6 +545,13 @@ div.rendered_html tbody tr:hover {
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="private-load-shapes.html" class="btn btn-neutral float-left" title="Computing Private Load Shapes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

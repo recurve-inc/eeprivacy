@@ -60,7 +60,9 @@ def test_private_histogram_helpers():
 
 
 def test_private_vector_clamped_mean_gaussian_helpers():
-    pass
+    op = PrivateVectorClampedMeanGaussian(lower_bound=0, upper_bound=1, k=2, N=1)
+    result = op.execute(vectors=[[0, 0]], epsilon=1.0, delta=1e-12)
+    assert result[0] != result[1]
 
 
 def test_private_clamped_sum_helpers():

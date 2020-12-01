@@ -41,7 +41,7 @@ class PrivateClampedSum(Operation):
         return private_sum
 
     def confidence_interval(self, *, epsilon, confidence=0.95):
-        """Compute the two-sided confidence interval for the mean."""
+        """Compute the two-sided confidence interval for the sum."""
         return LaplaceMechanism.confidence_interval(
             epsilon=epsilon,
             sensitivity=(self.upper_bound - self.lower_bound),
