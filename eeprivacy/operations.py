@@ -177,10 +177,11 @@ class PrivateVectorClampedMeanGaussian(Operation):
 
         exact_means = exact_sums / self.N
 
-        sensitivity = (upper_bound - lower_bound) * np.sqrt(k)
-
         private_means = GaussianMechanism.execute_batch(
-            values=exact_means, epsilon=epsilon, sensitivity=sensitivity, delta=delta
+            values=exact_means,
+            epsilon=epsilon,
+            sensitivity=self.sensitivity,
+            delta=delta,
         )
 
         return private_means
