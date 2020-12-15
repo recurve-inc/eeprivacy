@@ -296,7 +296,7 @@ class PrivateHistogram(Operation):
 
         Values are clamped to the bound specified by ``bins``.
 
-        Return: 
+        Return:
             A list of private counts, one for each bin.
         """
         sensitivity = self.max_individual_contribution
@@ -358,3 +358,36 @@ class PrivateQuantile(Operation):
         )
         max_idx = np.argmax(noisy_scores)
         return self.options[max_idx]
+
+
+class PrivateAboveThreshold(Operation):
+    """Return the index of the first query that exceeds a target threshold.
+
+    This technique was first describe in Chapter 3.6 of [Dwork and Roth] and
+    the implementation below is based on Chapter 10 of Programming Differential
+    Privacy [Near].
+
+    References:
+    - Dwork, C., Roth, A., 2013. The Algorithmic Foundations of Differential Privacy. FNT in Theoretical Computer Science 9, 211–407. https://doi.org/10.1561/0400000042
+    - Near, J. 2020. Programming Differential Privacy. https://uvm-plaid.github.io/programming-dp/notebooks/ch10.html
+    """
+
+    def execute(self, *, queries: List[float], threshold: float, epsilon: float):
+        """
+        Args:
+            queries: List of sensitivity-1 queries to choose from
+            threshold: Threshold above which the first query will be returned
+            epsilon: Privacy parameter
+
+        Return:
+            The index of the query that exceeds `threshold`.
+        """
+        noisy_threshold = threshold + LaplaceMechanism.execute(
+            value=0, sensitivity=2, epsilon=epsilon
+        )
+
+        for idx, q in enumerate(queries):
+            nu_i = LaplaceMechanism.execute(value=0, sensitivity=4, epsilon=epsilon)
+            if q + nu_i >= noisy_threshold:
+                return idx
+        return -1

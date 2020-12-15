@@ -8,3 +8,4 @@ build/
 .pytest_cache/
 .idea/
 .ipynb_checkpoints/
+scratch/
