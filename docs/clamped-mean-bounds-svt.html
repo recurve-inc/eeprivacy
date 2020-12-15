@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Gaussian Mechanism Basics &mdash; Energy Differential Privacy  documentation</title>
+  <title>Computing Clamped Mean Bounds with the Sparse Vector Technique &mdash; Energy Differential Privacy  documentation</title>
   
 
   
@@ -39,8 +39,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Stochastically Testing Privacy Mechanisms" href="stochastic-testing.html" />
-    <link rel="prev" title="Laplace Mechanism Basics" href="laplace-mechanism-basics.html" /> 
+    <link rel="next" title="Private Load Shape Algorithm Design" href="private-load-shape-algorithm-design.html" />
+    <link rel="prev" title="Computing Bounds for Clamped Means" href="clamped-mean-bounds.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,14 +92,13 @@
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="laplace-mechanism-basics.html">Laplace Mechanism Basics</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Gaussian Mechanism Basics</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#Distribution-of-Gaussian-Mechanism-Outputs">Distribution of Gaussian Mechanism Outputs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Gaussian-Mechanism-Confidence-Interval">Gaussian Mechanism Confidence Interval</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="gaussian-mechanism-basics.html">Gaussian Mechanism Basics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stochastic-testing.html">Stochastically Testing Privacy Mechanisms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clamped-mean-bounds.html">Computing Bounds for Clamped Means</a></li>
-<li class="toctree-l1"><a class="reference internal" href="clamped-mean-bounds-svt.html">Computing Clamped Mean Bounds with the Sparse Vector Technique</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Computing Clamped Mean Bounds with the Sparse Vector Technique</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Sparse-Vector-Technique-for-Clamping-Bounds">Sparse Vector Technique for Clamping Bounds</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="private-load-shape-algorithm-design.html">Private Load Shape Algorithm Design</a></li>
 <li class="toctree-l1"><a class="reference internal" href="private-load-shapes.html">Computing Private Load Shapes</a></li>
 </ul>
@@ -152,13 +151,13 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Gaussian Mechanism Basics</li>
+      <li>Computing Clamped Mean Bounds with the Sparse Vector Technique</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/gaussian-mechanism-basics.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/clamped-mean-bounds-svt.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -426,119 +425,78 @@ div.rendered_html tbody tr:hover {
     text-align: unset;
 }
 </style>
-<div class="section" id="Gaussian-Mechanism-Basics">
-<h1>Gaussian Mechanism Basics<a class="headerlink" href="#Gaussian-Mechanism-Basics" title="Permalink to this headline">¶</a></h1>
-<p>The Gaussian Mechanism adds noise drawn from a Gaussian (normal) distribution to realize <span class="math notranslate nohighlight">\((\epsilon, \delta)\)</span> differential privacy.</p>
-<p>This mechanism has better performance for vector-valued queries than the Laplace Mechanism (queries that return many data points per individual at once).</p>
-<p>This notebook walks through the basic <code class="docutils literal notranslate"><span class="pre">eeprivacy</span></code> functions for working with the Gaussian Mechanism.</p>
+<div class="section" id="Computing-Clamped-Mean-Bounds-with-the-Sparse-Vector-Technique">
+<h1>Computing Clamped Mean Bounds with the Sparse Vector Technique<a class="headerlink" href="#Computing-Clamped-Mean-Bounds-with-the-Sparse-Vector-Technique" title="Permalink to this headline">¶</a></h1>
+<p>In <a class="reference internal" href="clamped-mean-bounds.html"><span class="doc">Computing Bounds for Clamped Means</span></a>, we determined the clamping parameters for a dataset of unknown range by issuing a <code class="docutils literal notranslate"><span class="pre">PrivateQuantile</span></code> query against a dataset. While simple, this approach depends on the assumption that clamping to the 99th percentile of a dataset will result in negligble error in downstream analytics. Sometimes it is desirable to determine clamping bounds with an error expression that is closer to the eventual use case.</p>
+<p>This notebook demonstrates how a clamping bound can be chosen with an error expression based on the result of a query of a population, choosing a clamping bound that results in population-level error less than a small threshold. We use a sum query for demonstration, but it could easily be a more complex calculation, like the average load shape.</p>
+<p>The approach employed here is adapted from <a class="reference external" href="https://uvm-plaid.github.io/programming-dp/notebooks/ch10.html#applying-the-sparse-vector-technique">Applying the Sparse Vector Technique</a> in <em>Programming Differential Privacy</em> [Near, 2020].</p>
+<div class="section" id="Sparse-Vector-Technique-for-Clamping-Bounds">
+<h2>Sparse Vector Technique for Clamping Bounds<a class="headerlink" href="#Sparse-Vector-Technique-for-Clamping-Bounds" title="Permalink to this headline">¶</a></h2>
+<p>With SVT, we will issue a series of queries with different choices of clamping bounds, seeking a bound that provides acceptable accuracy against a queries similar to those that will be issued later.</p>
+<p>We will issue a sequence of clamped sum queries against the entire pool of meters, looking for the first result that returns error less than a threshold. The threshold will be error less than 0.01 kWh average across 24 hours (or 0.24 kWh total across 24 hours).</p>
+<p><strong>How do you choose epsilon for the SVT query?</strong></p>
+<p>For SVT to return accurate results, the difference between “good” responses and “bad” response should be “large”. This is what the “Sparse” in “Sparse Vector Technique” refers to. For our use case, we use a synthetic population to dial in the SVT privacy parameter.</p>
+<p>Residential energy consumption values are closely approximated by a log-normal distribution. With <code class="docutils literal notranslate"><span class="pre">b</span></code> values (the clamping bound) spaced widely enough apart, each step will decrease error by an order of magnitude.</p>
+<p>ε should be chosen to distinguish the correct clamping bound in almost every cases (say, 999/1000).</p>
+<p>A demonstration with a synthetic population of 5,000 meters is shown below, resulting in a required ε of 0.2</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Preamble: imports and figure settings</span>
-
-<span class="kn">from</span> <span class="nn">eeprivacy</span> <span class="kn">import</span> <span class="p">(</span>
-  <span class="n">GaussianMechanism</span><span class="p">,</span>
-<span class="p">)</span>
-
+<span></span><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
 
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span> <span class="c1"># Fix seed for deterministic documentation</span>
+<span class="kn">from</span> <span class="nn">eeprivacy.mechanisms</span> <span class="kn">import</span> <span class="n">LaplaceMechanism</span>
+<span class="kn">from</span> <span class="nn">eeprivacy.operations</span> <span class="kn">import</span> <span class="n">PrivateAboveThreshold</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>  <span class="c1"># Fix seed for deterministic documentation</span>
 
 <span class="n">mpl</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;seaborn-white&quot;</span><span class="p">)</span>
 
 <span class="n">MD</span> <span class="o">=</span> <span class="mi">28</span>
 <span class="n">LG</span> <span class="o">=</span> <span class="mi">36</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-    <span class="s2">&quot;figure.figsize&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
-    <span class="s2">&quot;legend.fontsize&quot;</span><span class="p">:</span> <span class="n">MD</span><span class="p">,</span>
-    <span class="s2">&quot;axes.labelsize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
-    <span class="s2">&quot;axes.titlesize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
-    <span class="s2">&quot;xtick.labelsize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
-    <span class="s2">&quot;ytick.labelsize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
-<span class="p">})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;figure.figsize&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+        <span class="s2">&quot;legend.fontsize&quot;</span><span class="p">:</span> <span class="n">MD</span><span class="p">,</span>
+        <span class="s2">&quot;axes.labelsize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
+        <span class="s2">&quot;axes.titlesize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
+        <span class="s2">&quot;xtick.labelsize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
+        <span class="s2">&quot;ytick.labelsize&quot;</span><span class="p">:</span> <span class="n">LG</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="Distribution-of-Gaussian-Mechanism-Outputs">
-<h2>Distribution of Gaussian Mechanism Outputs<a class="headerlink" href="#Distribution-of-Gaussian-Mechanism-Outputs" title="Permalink to this headline">¶</a></h2>
-<p>For a given ε, noise is drawn from the normal distribution at <span class="math notranslate nohighlight">\(\sigma^2 = \frac{2s^2 \log(1.25/\delta)}{\epsilon^2}\)</span>. The <code class="docutils literal notranslate"><span class="pre">eeprivacy</span></code> function <code class="docutils literal notranslate"><span class="pre">gaussian_mechanism</span></code> draws this noise and adds it to a private value:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">trials</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-  <span class="n">trials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GaussianMechanism</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-    <span class="n">delta</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
-    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">1</span>
-  <span class="p">))</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Distribution of outputs from Gaussian Mechanism&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="_images/gaussian-mechanism-basics_3_0.png" src="_images/gaussian-mechanism-basics_3_0.png" />
-</div>
-</div>
-</div>
-<div class="section" id="Gaussian-Mechanism-Confidence-Interval">
-<h2>Gaussian Mechanism Confidence Interval<a class="headerlink" href="#Gaussian-Mechanism-Confidence-Interval" title="Permalink to this headline">¶</a></h2>
-<p>With the <code class="docutils literal notranslate"><span class="pre">eeprivacy</span></code> confidence interval functions, analysts can determine how far away the true value of a statistics is from the differentially private result.</p>
-<p>To determine the confidence interval for a given choice of privacy parameters, employ <code class="docutils literal notranslate"><span class="pre">eeprivacy.gaussian_mechanism_confidence_interval</span></code>.</p>
-<p>To determine the privacy parameters for a desired confidence interval, employ <code class="docutils literal notranslate"><span class="pre">eeprivacy.gaussian_mechanism_epsilon_for_confidence_interval</span></code>.</p>
-<p>The confidence intervals reported below are two-sided. For example, for a 95% confidence interval of +/-10, 2.5% of results will be smaller than -10 and 2.5% of results will be larger than +10.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">trials</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">):</span>
-  <span class="n">trials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GaussianMechanism</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-    <span class="n">delta</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
-    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">1</span>
-  <span class="p">))</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Distribution of outputs from Gaussian Mechanism&quot;</span><span class="p">)</span>
+<span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">6000</span>
+<span class="n">synthetic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mean</span><span class="o">=-</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span> <span class="o">*</span> <span class="mi">24</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">synthetic</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Distribution of hourly consumption values&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Hourly consumption (kWh)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Count&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="n">ci</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% Confidence Interval (Stochastic): </span><span class="si">{</span><span class="n">ci</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">clipped_sums</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">bs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bs</span><span class="p">:</span>
+    <span class="n">clipped_sums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">synthetic</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">synthetic</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="p">)</span>
 
-<span class="n">ci</span> <span class="o">=</span> <span class="n">GaussianMechanism</span><span class="o">.</span><span class="n">confidence_interval</span><span class="p">(</span>
-  <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-  <span class="n">delta</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
-  <span class="n">sensitivity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-  <span class="n">confidence</span><span class="o">=</span><span class="mf">0.95</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% Confidence Interval (Exact): </span><span class="si">{</span><span class="n">ci</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Now in reverse:</span>
-<span class="n">epsilon</span> <span class="o">=</span> <span class="n">GaussianMechanism</span><span class="o">.</span><span class="n">epsilon_for_confidence_interval</span><span class="p">(</span>
-  <span class="n">target_ci</span><span class="o">=</span><span class="mf">146.288</span><span class="p">,</span>
-  <span class="n">delta</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
-  <span class="n">sensitivity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-  <span class="n">confidence</span><span class="o">=</span><span class="mf">0.95</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ε for confidence interval: </span><span class="si">{</span><span class="n">epsilon</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">clipped_sums</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Clipped sum error term&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Clipping Upper Bound (kWh)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -546,18 +504,58 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/gaussian-mechanism-basics_5_0.png" src="_images/gaussian-mechanism-basics_5_0.png" />
+<img alt="_images/clamped-mean-bounds-svt_2_0.png" src="_images/clamped-mean-bounds-svt_2_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="highlight"><pre>
-95% Confidence Interval (Stochastic): 146.00710633910379
-95% Confidence Interval (Exact): 146.28781668617955
-ε for confidence interval: 0.09999987468977604
-</pre></div></div>
+<img alt="_images/clamped-mean-bounds-svt_2_1.png" src="_images/clamped-mean-bounds-svt_2_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">trials</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">qs</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">clipped_sums</span><span class="p">)</span>
+
+<span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">N</span> <span class="o">*</span> <span class="mi">24</span>
+
+<span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.2</span>
+
+<span class="n">above_threshold</span> <span class="o">=</span> <span class="n">PrivateAboveThreshold</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">trials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">above_threshold</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">queries</span><span class="o">=</span><span class="n">qs</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=-</span><span class="n">threshold</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">trials</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trials at ε=</span><span class="si">{</span><span class="n">epsilon</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/clamped-mean-bounds-svt_3_0.png" src="_images/clamped-mean-bounds-svt_3_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -570,10 +568,10 @@ div.rendered_html tbody tr:hover {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="stochastic-testing.html" class="btn btn-neutral float-right" title="Stochastically Testing Privacy Mechanisms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="private-load-shape-algorithm-design.html" class="btn btn-neutral float-right" title="Private Load Shape Algorithm Design" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="laplace-mechanism-basics.html" class="btn btn-neutral float-left" title="Laplace Mechanism Basics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="clamped-mean-bounds.html" class="btn btn-neutral float-left" title="Computing Bounds for Clamped Means" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

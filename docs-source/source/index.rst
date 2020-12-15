@@ -24,6 +24,7 @@ In the ecosystem of open source differential privacy projects, EDP targets a sec
    gaussian-mechanism-basics
    stochastic-testing
    clamped-mean-bounds
+   clamped-mean-bounds-svt
    private-load-shape-algorithm-design
    private-load-shapes
 

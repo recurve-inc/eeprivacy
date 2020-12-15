@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gaussian-mechanism-basics.html">Gaussian Mechanism Basics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stochastic-testing.html">Stochastically Testing Privacy Mechanisms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clamped-mean-bounds.html">Computing Bounds for Clamped Means</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clamped-mean-bounds-svt.html">Computing Clamped Mean Bounds with the Sparse Vector Technique</a></li>
 <li class="toctree-l1"><a class="reference internal" href="private-load-shape-algorithm-design.html">Private Load Shape Algorithm Design</a></li>
 <li class="toctree-l1"><a class="reference internal" href="private-load-shapes.html">Computing Private Load Shapes</a></li>
 </ul>
@@ -223,12 +224,12 @@
         <li><a href="eeprivacy.html#eeprivacy.operations.PrivateVectorClampedMeanGaussian.epsilon_for_confidence_interval">(eeprivacy.operations.PrivateVectorClampedMeanGaussian method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="eeprivacy.html#eeprivacy.mechanisms.GaussianMechanism.execute">execute() (eeprivacy.mechanisms.GaussianMechanism static method)</a>
 
       <ul>
         <li><a href="eeprivacy.html#eeprivacy.mechanisms.LaplaceMechanism.execute">(eeprivacy.mechanisms.LaplaceMechanism static method)</a>
+</li>
+        <li><a href="eeprivacy.html#eeprivacy.operations.PrivateAboveThreshold.execute">(eeprivacy.operations.PrivateAboveThreshold method)</a>
 </li>
         <li><a href="eeprivacy.html#eeprivacy.operations.PrivateClampedMean.execute">(eeprivacy.operations.PrivateClampedMean method)</a>
 </li>
@@ -243,6 +244,8 @@
         <li><a href="eeprivacy.html#eeprivacy.operations.PrivateVectorClampedMeanLaplace.execute">(eeprivacy.operations.PrivateVectorClampedMeanLaplace method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="eeprivacy.html#eeprivacy.mechanisms.GaussianMechanism.execute_batch">execute_batch() (eeprivacy.mechanisms.GaussianMechanism static method)</a>
 
       <ul>
@@ -286,14 +289,16 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="eeprivacy.html#eeprivacy.operations.PrivateAboveThreshold">PrivateAboveThreshold (class in eeprivacy.operations)</a>
+</li>
       <li><a href="eeprivacy.html#eeprivacy.operations.PrivateClampedMean">PrivateClampedMean (class in eeprivacy.operations)</a>
 </li>
       <li><a href="eeprivacy.html#eeprivacy.operations.PrivateClampedSum">PrivateClampedSum (class in eeprivacy.operations)</a>
 </li>
-      <li><a href="eeprivacy.html#eeprivacy.operations.PrivateHistogram">PrivateHistogram (class in eeprivacy.operations)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="eeprivacy.html#eeprivacy.operations.PrivateHistogram">PrivateHistogram (class in eeprivacy.operations)</a>
+</li>
       <li><a href="eeprivacy.html#eeprivacy.operations.PrivateQuantile">PrivateQuantile (class in eeprivacy.operations)</a>
 </li>
       <li><a href="eeprivacy.html#eeprivacy.operations.PrivateVectorClampedMeanGaussian">PrivateVectorClampedMeanGaussian (class in eeprivacy.operations)</a>

@@ -102,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gaussian-mechanism-basics.html">Gaussian Mechanism Basics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stochastic-testing.html">Stochastically Testing Privacy Mechanisms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clamped-mean-bounds.html">Computing Bounds for Clamped Means</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clamped-mean-bounds-svt.html">Computing Clamped Mean Bounds with the Sparse Vector Technique</a></li>
 <li class="toctree-l1"><a class="reference internal" href="private-load-shape-algorithm-design.html">Private Load Shape Algorithm Design</a></li>
 <li class="toctree-l1"><a class="reference internal" href="private-load-shapes.html">Computing Private Load Shapes</a></li>
 </ul>
@@ -203,6 +204,37 @@
 <h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
 <p>An <cite>Operation</cite> encapsulates the full workflow of common analytics tasks: running statistics (like means, histograms, and quantiles), reporting on accuracy, and supporting analysis of privacy/accuracy tradeoffs.</p>
 <span class="target" id="module-eeprivacy.operations"></span><dl class="py class">
+<dt id="eeprivacy.operations.PrivateAboveThreshold">
+<em class="property">class </em><code class="sig-prename descclassname">eeprivacy.operations.</code><code class="sig-name descname">PrivateAboveThreshold</code><a class="headerlink" href="#eeprivacy.operations.PrivateAboveThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index of the first query that exceeds a target threshold.</p>
+<p>This technique was first describe in Chapter 3.6 of [Dwork and Roth] and
+the implementation below is based on Chapter 10 of Programming Differential
+Privacy [Near].</p>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>Dwork, C., Roth, A., 2013. The Algorithmic Foundations of Differential Privacy. FNT in Theoretical Computer Science 9, 211–407. <a class="reference external" href="https://doi.org/10.1561/0400000042">https://doi.org/10.1561/0400000042</a></p></li>
+<li><p>Near, J. 2020. Programming Differential Privacy. <a class="reference external" href="https://uvm-plaid.github.io/programming-dp/notebooks/ch10.html">https://uvm-plaid.github.io/programming-dp/notebooks/ch10.html</a></p></li>
+</ul>
+<dl class="py method">
+<dt id="eeprivacy.operations.PrivateAboveThreshold.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">queries</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">threshold</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">epsilon</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateAboveThreshold.execute" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>queries</strong> – List of sensitivity-1 queries to choose from</p></li>
+<li><p><strong>threshold</strong> – Threshold above which the first query will be returned</p></li>
+<li><p><strong>epsilon</strong> – Privacy parameter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The index of the query that exceeds <cite>threshold</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="eeprivacy.operations.PrivateClampedMean">
 <em class="property">class </em><code class="sig-prename descclassname">eeprivacy.operations.</code><code class="sig-name descname">PrivateClampedMean</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">lower_bound</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">upper_bound</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateClampedMean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute a mean, bounding sensitivity with clamping. Employs the Laplace Mechanism.</p>
@@ -243,7 +275,7 @@
 <dl class="py method">
 <dt id="eeprivacy.operations.PrivateClampedSum.confidence_interval">
 <code class="sig-name descname">confidence_interval</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">epsilon</span></em>, <em class="sig-param"><span class="n">confidence</span><span class="o">=</span><span class="default_value">0.95</span></em><span class="sig-paren">)</span><a class="headerlink" href="#eeprivacy.operations.PrivateClampedSum.confidence_interval" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the two-sided confidence interval for the mean.</p>
+<dd><p>Compute the two-sided confidence interval for the sum.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -326,8 +358,10 @@ multiple points to the dataset.</p></li>
 </ul>
 </dd>
 </dl>
-<p>References:
-- Dwork, C., Roth, A., 2013. The Algorithmic Foundations of Differential Privacy. FNT in Theoretical Computer Science 9, 211–407. <a class="reference external" href="https://doi.org/10.1561/0400000042">https://doi.org/10.1561/0400000042</a></p>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>Dwork, C., Roth, A., 2013. The Algorithmic Foundations of Differential Privacy. FNT in Theoretical Computer Science 9, 211–407. <a class="reference external" href="https://doi.org/10.1561/0400000042">https://doi.org/10.1561/0400000042</a></p></li>
+</ul>
 </dd></dl>
 
 </dd></dl>

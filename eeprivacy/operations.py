@@ -342,7 +342,7 @@ class PrivateQuantile(Operation):
             quantile: Quantile to return (between 0 and 1)
 
         References:
-        - Dwork, C., Roth, A., 2013. The Algorithmic Foundations of Differential Privacy. FNT in Theoretical Computer Science 9, 211–407. https://doi.org/10.1561/0400000042
+            - Dwork, C., Roth, A., 2013. The Algorithmic Foundations of Differential Privacy. FNT in Theoretical Computer Science 9, 211–407. https://doi.org/10.1561/0400000042
         """
         N = len(values)
 
@@ -361,15 +361,16 @@ class PrivateQuantile(Operation):
 
 
 class PrivateAboveThreshold(Operation):
-    """Return the index of the first query that exceeds a target threshold.
+    """
+    Return the index of the first query that exceeds a target threshold.
 
     This technique was first describe in Chapter 3.6 of [Dwork and Roth] and
     the implementation below is based on Chapter 10 of Programming Differential
     Privacy [Near].
 
     References:
-    - Dwork, C., Roth, A., 2013. The Algorithmic Foundations of Differential Privacy. FNT in Theoretical Computer Science 9, 211–407. https://doi.org/10.1561/0400000042
-    - Near, J. 2020. Programming Differential Privacy. https://uvm-plaid.github.io/programming-dp/notebooks/ch10.html
+        - Dwork, C., Roth, A., 2013. The Algorithmic Foundations of Differential Privacy. FNT in Theoretical Computer Science 9, 211–407. https://doi.org/10.1561/0400000042
+        - Near, J. 2020. Programming Differential Privacy. https://uvm-plaid.github.io/programming-dp/notebooks/ch10.html
     """
 
     def execute(self, *, queries: List[float], threshold: float, epsilon: float):

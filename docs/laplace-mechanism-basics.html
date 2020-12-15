@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gaussian-mechanism-basics.html">Gaussian Mechanism Basics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stochastic-testing.html">Stochastically Testing Privacy Mechanisms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clamped-mean-bounds.html">Computing Bounds for Clamped Means</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clamped-mean-bounds-svt.html">Computing Clamped Mean Bounds with the Sparse Vector Technique</a></li>
 <li class="toctree-l1"><a class="reference internal" href="private-load-shape-algorithm-design.html">Private Load Shape Algorithm Design</a></li>
 <li class="toctree-l1"><a class="reference internal" href="private-load-shapes.html">Computing Private Load Shapes</a></li>
 </ul>
@@ -472,7 +473,7 @@ div.rendered_html tbody tr:hover {
 <h2>Distribution of Laplace Mechanism Outputs<a class="headerlink" href="#Distribution-of-Laplace-Mechanism-Outputs" title="Permalink to this headline">¶</a></h2>
 <p>For a given ε, noise is drawn from the Laplace distribution at <code class="docutils literal notranslate"><span class="pre">b</span></code>=<code class="docutils literal notranslate"><span class="pre">sensitivity</span></code>/ε. The <code class="docutils literal notranslate"><span class="pre">eeprivacy</span></code> class <code class="docutils literal notranslate"><span class="pre">LaplaceMechanism</span></code> draws this noise and adds it to a private value:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -494,8 +495,18 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/laplace-mechanism-basics_3_0.png" src="_images/laplace-mechanism-basics_3_0.png" />
-</div>
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-1-4ba7af56c713&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> trials <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">]</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-green-fg">for</span> t <span class="ansi-green-fg">in</span> range<span class="ansi-blue-fg">(</span><span class="ansi-cyan-fg">1000</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">----&gt; 3</span><span class="ansi-red-fg">   trials.append(LaplaceMechanism.execute(
+</span><span class="ansi-green-intense-fg ansi-bold">      4</span>     value<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">      5</span>     epsilon<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">0.1</span><span class="ansi-blue-fg">,</span>
+
+<span class="ansi-red-fg">NameError</span>: name &#39;LaplaceMechanism&#39; is not defined
+</pre></div></div>
 </div>
 </div>
 <div class="section" id="Laplace-Mechanism-Confidence-Interval">
