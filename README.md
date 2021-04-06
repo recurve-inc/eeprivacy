@@ -7,7 +7,7 @@ This repository contains the pilot implementation of the core privacy methods fo
 * Python API documentation for `eeprivacy`
 * Sample implementations of key use cases
 
-[Examples and library documentation](https://openeemeter.github.io/eeprivacy/)
+[Examples and library documentation](https://recurve-inc.github.io/eeprivacy/)
 
 ---
 
@@ -25,7 +25,7 @@ Local Usage
 
 **Notebooks**
 
-With your preferred notebook environment (like [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/) or [nteract](https://nteract.io/)), install `eeprivacy` and try out any of the [example notebooks](https://openeemeter.github.io/eeprivacy/private-load-shape-algorithm-design.html). 
+With your preferred notebook environment (like [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/) or [nteract](https://nteract.io/)), install `eeprivacy` and try out any of the [example notebooks](https://recurve-inc.github.io/eeprivacy/private-load-shape-algorithm-design.html). 
 
 **REPL**
 
